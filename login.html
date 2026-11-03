@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- NEW SHORT TITLE -->
+    <title>Login — Influencer Track</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Login Page CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}">
+    
+    <!-- Custom CSS for the floating Home button -->
+    <style>
+        .home-btn {
+            position: absolute;
+            top: 30px;
+            left: 30px;
+            background: rgba(255, 255, 255, 0.9);
+            color: #450a0a;
+            border: 1px solid #fecaca;
+            border-radius: 8px;
+            padding: 10px 20px;
+            font-weight: 600;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            z-index: 100;
+        }
+        .home-btn:hover {
+            background: #ffffff;
+            color: #dc2626;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(220, 38, 38, 0.15);
+        }
+    </style>
+</head>
+<body class="login-page">
+    
+    <!-- FLOATING HOME BUTTON -->
+    <a href="/" class="home-btn">
+        <i class="fas fa-arrow-left"></i> Back to Home
+    </a>
+
+    <div class="login-container">
+
+        <!-- LEFT PANEL: BRANDING & FEATURES -->
+        <div class="login-brand-panel">
+            <div class="brand-logo">
+                <div class="brand-logo-icon">
+                    <i class="fas fa-bolt"></i>
+                </div>
+                <!-- NEW BRAND NAME -->
+                <div class="brand-logo-text">Influencer Track</div>
+            </div>
+
+            <div class="brand-hero">
+                <h2>Discover, engage &<br>track influencers.</h2>
+                <p>Everything you need to run high-performance creator campaigns in one place.</p>
+            </div>
+
+            <div class="brand-features">
+                <div class="brand-feature">
+                    <div class="brand-feature-icon"><i class="fas fa-users"></i></div>
+                    <span>Discover and manage top creators</span>
+                </div>
+                <div class="brand-feature">
+                    <div class="brand-feature-icon"><i class="fas fa-chart-line"></i></div>
+                    <span>Track campaign performance in real time</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- RIGHT PANEL: LOGIN FORM -->
+        <div class="login-form-panel">
+            <div class="login-form-header">
+                <h3>Welcome back</h3>
+                <p>Sign in to continue to your dashboard</p>
+            </div>
+
+            <!-- FLASH MESSAGES (Invalid Credentials) -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }}">
+                            <i class="fas fa-exclamation-circle"></i>
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            <!-- LOGIN FORM -->
+            <form method="POST" class="login-form">
+                <div class="form-group">
+                    <label for="email">Email address</label>
+                    <div class="input-wrapper">
+                        <i class="fas fa-envelope"></i>
+                        <input type="email" id="email" name="email"
+                               placeholder="you@example.com" required
+                               value="admin@system.com" autocomplete="username">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <div class="input-wrapper">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" id="password" name="password"
+                               placeholder="Enter your password" required
+                               value="admin123" autocomplete="current-password">
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-login">
+                    <i class="fas fa-arrow-right-to-bracket"></i>
+                    Sign in
+                </button>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

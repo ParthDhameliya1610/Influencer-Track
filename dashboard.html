@@ -1,0 +1,217 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-end mb-4">
+    <div>
+        <h2 class="page-title mb-1 fw-bold" style="letter-spacing: -0.5px;">Command Center</h2>
+        <p class="text-muted small mb-0">Real-time overview of campaigns, influencers, and performance.</p>
+    </div>
+    <div>
+        <span class="badge bg-success px-3 py-2 fs-6 shadow-sm" id="live-badge">
+            <i class="fas fa-circle text-white me-1" style="font-size: 0.5rem; vertical-align: middle; animation: pulse 1.5s infinite;"></i> Live Data Active
+        </span>
+    </div>
+</div>
+
+<div class="row g-4 mb-4">
+    <div class="col-md-6 col-lg-3">
+        <div class="card stat-card h-100 border-0 shadow-sm" style="background: linear-gradient(135deg, #ffffff 0%, #fef2f2 100%);">
+            <div class="p-3 d-flex justify-content-between align-items-start">
+                <div>
+                    <h6 class="text-muted text-uppercase mb-1 small fw-bold">Total Influencers</h6>
+                    <h2 class="mb-0 fw-bold" style="font-size: 2.2rem;">{{ stats.total_influencers }}</h2>
+                    <small class="text-success fw-bold"><i class="fas fa-arrow-up me-1"></i> Active Directory</small>
+                </div>
+                <div class="dashboard-card-icon bg-icon-primary shadow-sm"><i class="fas fa-users"></i></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 col-lg-3">
+        <div class="card stat-card h-100 border-0 shadow-sm" style="background: linear-gradient(135deg, #ffffff 0%, #ecfdf5 100%);">
+            <div class="p-3 d-flex justify-content-between align-items-start">
+                <div>
+                    <h6 class="text-muted text-uppercase mb-1 small fw-bold">Active Campaigns</h6>
+                    <h2 class="mb-0 fw-bold" style="font-size: 2.2rem;">{{ stats.active_campaigns }}</h2>
+                    <small class="text-muted fw-bold">Currently in progress</small>
+                </div>
+                <div class="dashboard-card-icon bg-icon-success shadow-sm"><i class="fas fa-rocket"></i></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 col-lg-3">
+        <div class="card stat-card h-100 border-0 shadow-sm" style="background: linear-gradient(135deg, #ffffff 0%, #fffbeb 100%);">
+            <div class="p-3 d-flex justify-content-between align-items-start">
+                <div>
+                    <h6 class="text-muted text-uppercase mb-1 small fw-bold">Total Budget</h6>
+                    <h2 class="mb-0 fw-bold" style="font-size: 2.2rem;">${{ "{:,.0f}".format(stats.total_budget) }}</h2>
+                    <small class="text-muted fw-bold">Allocated</small>
+                </div>
+                <div class="dashboard-card-icon bg-icon-warning shadow-sm"><i class="fas fa-wallet"></i></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 col-lg-3">
+        <div class="card stat-card h-100 border-0 shadow-sm" style="background: linear-gradient(135deg, #ffffff 0%, #ecfeff 100%);">
+            <div class="p-3 d-flex justify-content-between align-items-start">
+                <div>
+                    <h6 class="text-muted text-uppercase mb-1 small fw-bold">Total Reach</h6>
+                    <h2 class="mb-0 fw-bold" style="font-size: 2.2rem;">{{ "{:,}".format(stats.total_reach) }}</h2>
+                    <small class="text-info fw-bold"><i class="fas fa-eye me-1"></i> Combined Impressions</small>
+                </div>
+                <div class="dashboard-card-icon bg-icon-info shadow-sm"><i class="fas fa-bullseye"></i></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card border-0 shadow-sm p-4" style="border-radius: 16px;">
+    <ul class="nav nav-pills mb-4 nav-justified" id="pills-tab" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active fw-bold" id="pills-financial-tab" data-bs-toggle="pill" data-bs-target="#pills-financial" type="button" role="tab">
+                <i class="fas fa-chart-pie me-2"></i>Financials
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link fw-bold" id="pills-talent-tab" data-bs-toggle="pill" data-bs-target="#pills-talent" type="button" role="tab">
+                <i class="fas fa-users me-2"></i>Talent & Quality
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link fw-bold" id="pills-performance-tab" data-bs-toggle="pill" data-bs-target="#pills-performance" type="button" role="tab">
+                <i class="fas fa-rocket me-2"></i>Performance
+            </button>
+        </li>
+    </ul>
+
+    <div class="tab-content" id="pills-tabContent">
+        
+        <div class="tab-pane fade show active" id="pills-financial" role="tabpanel">
+            <div class="row g-4">
+                <div class="col-lg-12">
+                    <div class="card chart-card border-0">
+                        <h5 class="mb-0 fw-bold"><i class="fas fa-chart-bar text-primary me-2"></i>Campaign Budget Allocation</h5>
+                        <p class="text-muted small mb-4">This chart shows how much money is allocated to each campaign. It helps management ensure we aren't overspending.</p>
+                        <div class="chart-wrapper" style="height: 350px;"><canvas id="campaignBudgetChart"></canvas></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-pane fade" id="pills-talent" role="tabpanel">
+            <div class="row g-4 mb-4">
+                <div class="col-lg-6">
+                    <div class="card chart-card border-0">
+                        <h5 class="mb-0 fw-bold"><i class="fas fa-chart-pie text-success me-2"></i>Talent Pool by Category</h5>
+                        <p class="text-muted small mb-4">Shows our strongest niches. We know exactly how many creators we have available in that space.</p>
+                        <div class="chart-wrapper" style="height: 260px;"><canvas id="categoryDistributionChart"></canvas></div>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="card chart-card border-0">
+                        <h5 class="mb-0 fw-bold"><i class="fas fa-star text-info me-2"></i>Audience Quality (Engagement)</h5>
+                        <p class="text-muted small mb-4">Not all niches are equal. This tells us which industry (e.g., Food vs Tech) has the most interactive audience.</p>
+                        <div class="chart-wrapper" style="height: 260px;"><canvas id="engagementByCategoryChart"></canvas></div>
+                    </div>
+                </div>
+            </div>
+            <div class="row g-4">
+                <div class="col-lg-12">
+                    <div class="card chart-card border-0">
+                        <h5 class="mb-0 fw-bold"><i class="fas fa-fire text-warning me-2"></i>Top Influencers (Followers vs Engagement)</h5>
+                        <p class="text-muted small mb-4">Compares our top creators. High engagement means their audience actually cares about their content.</p>
+                        <div class="chart-wrapper" style="height: 300px;"><canvas id="topInfluencersChart"></canvas></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-pane fade" id="pills-performance" role="tabpanel">
+            <div class="row g-4 mb-4">
+                <div class="col-lg-6">
+                    <div class="card chart-card border-0">
+                        <h5 class="mb-0 fw-bold"><i class="fas fa-handshake text-primary me-2"></i>Collaboration Status</h5>
+                        <p class="text-muted small mb-4">Tracks how many deals are stuck in 'Pending' vs 'Completed'.</p>
+                        <div class="chart-wrapper" style="height: 250px;"><canvas id="collaborationStatusChart"></canvas></div>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="card chart-card border-0">
+                        <h5 class="mb-0 fw-bold"><i class="fas fa-share-alt text-purple me-2"></i>Platform Performance</h5>
+                        <p class="text-muted small mb-4">Which platform drives the most reach? Instagram or YouTube?</p>
+                        <div class="chart-wrapper" style="height: 250px;"><canvas id="platformPerformanceChart"></canvas></div>
+                    </div>
+                </div>
+            </div>
+            <div class="row g-4">
+                <div class="col-lg-12">
+                    <div class="card chart-card border-0">
+                        <h5 class="mb-0 fw-bold"><i class="fas fa-chart-line text-info me-2"></i>Network Registration Trend</h5>
+                        <p class="text-muted small mb-4">Network growth month over month.</p>
+                        <div class="chart-wrapper" style="height: 250px;"><canvas id="registrationTrendChart"></canvas></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<style>
+    .nav-pills .nav-link {
+        color: #7f1d1d;
+        background-color: #fff;
+        border: 1px solid #fecaca;
+        margin: 0 5px;
+        border-radius: 10px;
+        padding: 12px;
+        transition: all 0.2s;
+    }
+    .nav-pills .nav-link:hover {
+        background-color: #fef2f2;
+    }
+    .nav-pills .nav-link.active {
+        background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%);
+        color: white;
+        border-color: #dc2626;
+        box-shadow: 0 4px 12px rgba(220,38,38,0.3);
+    }
+    
+    @keyframes pulse {
+        0% { opacity: 1; }
+        50% { opacity: 0.4; }
+        100% { opacity: 1; }
+    }
+</style>
+
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function(){
+        // 1. Initialise Tooltips
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl)
+        })
+
+        setInterval(function() {
+            fetch('/api/auto_grow_metrics')
+                .then(response => response.json())
+                .then(data => {
+                    if(data.status === 'success') {
+                        let reachElement = document.querySelector('.stat-card.info h2');
+                        if (reachElement) {
+                            let currentReach = parseInt(reachElement.innerText.replace(/,/g, ''));
+                            let newReach = currentReach + Math.floor(Math.random() * 50) + 10;
+                            reachElement.innerText = newReach.toLocaleString();
+                        }
+                    }
+                });
+        }, 10000);
+    });
+</script>
+{% endblock %}

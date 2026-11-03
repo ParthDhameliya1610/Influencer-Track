@@ -1,0 +1,189 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2 class="page-title mb-1">Campaign Management</h2>
+        <p class="text-muted small mb-0">Track budgets, assign influencers, and monitor active campaigns.</p>
+    </div>
+    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createCampaignModal">
+        <i class="fas fa-plus me-2"></i>Create Campaign
+    </button>
+</div>
+
+<!-- Campaign Grid Cards -->
+<div class="row g-4">
+    {% for c in campaigns %}
+    <div class="col-md-6 col-lg-4">
+        <div class="card h-100 p-0 position-relative shadow-sm campaign-card">
+            
+            <!-- Header with Status -->
+            <div class="p-3 border-bottom d-flex justify-content-between align-items-center bg-light bg-opacity-50 rounded-top">
+                <div class="d-flex align-items-center gap-2">
+                    <div class="dashboard-card-icon bg-icon-primary" style="width: 36px; height: 36px; font-size: 0.9rem;">
+                        <i class="fas fa-bullhorn"></i>
+                    </div>
+                    <div>
+                        <h6 class="fw-bold mb-0 text-truncate" style="max-width: 180px;" title="{{ c.campaign_name }}">
+                            {{ c.campaign_name }}
+                        </h6>
+                        <small class="text-muted" style="font-size: 0.7rem;">By {{ c.created_by_name or 'System' }}</small>
+                    </div>
+                </div>
+                <span class="badge bg-{{ 'success' if c.status == 'Active' else 'secondary' }}">
+                    {{ c.status }}
+                </span>
+            </div>
+
+            <div class="p-3">
+                <!-- Product Info -->
+                <div class="d-flex align-items-center gap-3 mb-3 p-2 rounded bg-light border">
+                    {% if c.product_name %}
+                        <img src="{{ c.product_image_url or 'https://cdn-icons-png.flaticon.com/512/679/679720.png' }}" 
+                             alt="{{ c.product_name }}" 
+                             class="rounded shadow-sm border border-2 border-white"
+                             style="width: 48px; height: 48px; object-fit: contain; background: #fff;">
+                        <div>
+                            <small class="text-muted d-block text-uppercase" style="font-size: 0.65rem; font-weight: 700;">Linked Product</small>
+                            <strong class="text-dark" style="font-size: 0.85rem;">{{ c.product_name }}</strong>
+                        </div>
+                    {% else %}
+                        <div class="d-flex align-items-center justify-content-center rounded bg-white border shadow-sm" style="width: 48px; height: 48px;">
+                            <i class="fas fa-box-open text-muted"></i>
+                        </div>
+                        <div>
+                            <small class="text-muted d-block text-uppercase" style="font-size: 0.65rem; font-weight: 700;">Linked Product</small>
+                            <span class="text-muted small">N/A</span>
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- Objective -->
+                <p class="text-muted small mb-3" style="min-height: 40px;">
+                    {{ c.objective or 'No specific objective set for this campaign.' }}
+                </p>
+
+                <!-- Financials -->
+                <div class="row text-center mb-3">
+                    <div class="col-6 border-end">
+                        <small class="text-muted d-block" style="font-size: 0.75rem;">
+                            Budget 
+                            <i class="fas fa-info-circle" data-bs-toggle="tooltip" title="Total allocated budget for this campaign."></i>
+                        </small>
+                        <strong class="text-dark">${{ "{:,.0f}".format(c.budget) }}</strong>
+                    </div>
+                    <div class="col-6">
+                        <small class="text-muted d-block" style="font-size: 0.75rem;">
+                            Committed
+                            <i class="fas fa-info-circle" data-bs-toggle="tooltip" title="Total agreed rates locked in with assigned influencers."></i>
+                        </small>
+                        <strong class="text-primary">${{ "{:,.0f}".format(c.committed_budget) }}</strong>
+                    </div>
+                </div>
+
+                <!-- Influencers -->
+                <div class="d-flex justify-content-center gap-2 mb-3">
+                    <span class="badge bg-light text-dark border">
+                        <i class="fas fa-users me-1 text-muted"></i> {{ c.influencer_count }} Assigned
+                    </span>
+                    <span class="badge bg-success bg-opacity-10 text-success border border-success">
+                        <i class="fas fa-check me-1"></i> {{ c.completed_count }} Done
+                    </span>
+                </div>
+
+                <!-- Dates -->
+                <div class="text-center small text-muted mb-3">
+                    <i class="far fa-calendar-alt me-1"></i> {{ c.start_date }} <span class="mx-1">→</span> {{ c.end_date }}
+                </div>
+            </div>
+
+            <!-- Footer Actions -->
+            <div class="p-3 bg-light bg-opacity-50 border-top rounded-bottom mt-auto">
+                <a href="{{ url_for('campaign_performance', id=c.campaign_id) }}" 
+                   class="btn btn-outline-primary w-100 fw-bold">
+                    <i class="fas fa-sliders-h me-2"></i>Manage Campaign
+                </a>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="col-12 text-center py-5 text-muted">
+        <i class="fas fa-folder-open fs-2 mb-3 text-light"></i>
+        <h5>No campaigns found.</h5>
+        <p>Click "Create Campaign" to launch your first marketing initiative.</p>
+    </div>
+    {% endfor %}
+</div>
+
+<!-- ========================================== -->
+<!-- CREATE CAMPAIGN MODAL                      -->
+<!-- ========================================== -->
+<div class="modal fade" id="createCampaignModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form action="{{ url_for('create_campaign') }}" method="POST">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="fas fa-bullhorn me-2 text-primary"></i>Create New Campaign</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Campaign Name *</label>
+                        <input type="text" name="name" class="form-control" placeholder="e.g., Summer Tech Launch 2024" required>
+                    </div>
+
+                    <!-- PRODUCT DROPDOWN -->
+                    <div class="mb-3">
+                        <label class="form-label">Linked Product</label>
+                        <select name="product_id" class="form-select">
+                            <option value="">-- No specific product --</option>
+                            {% for p in products %}
+                                <option value="{{ p.product_id }}">{{ p.product_name }}</option>
+                            {% endfor %}
+                        </select>
+                        <small class="text-muted">Select the product this campaign is promoting.</small>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Total Budget ($) *</label>
+                        <input type="number" step="0.01" name="budget" class="form-control" placeholder="5000.00" required>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Start Date *</label>
+                            <input type="date" name="start_date" class="form-control" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">End Date *</label>
+                            <input type="date" name="end_date" class="form-control" required>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Objective</label>
+                        <textarea name="objective" class="form-control" rows="3" placeholder="e.g., Generate 1M impressions and drive sales..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary"><i class="fas fa-check me-1"></i> Create Campaign</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Activate tooltips
+    document.addEventListener("DOMContentLoaded", function(){
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl)
+        })
+    });
+</script>
+{% endblock %}

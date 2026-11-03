@@ -1,0 +1,302 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2 class="page-title mb-1">Influencer Discovery</h2>
+        <p class="text-muted small mb-0">
+            Showing results for: <strong class="text-primary">{{ request.args.get('category', 'All Categories') }}</strong>
+        </p>
+    </div>
+    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addInfluencerModal">
+        <i class="fas fa-user-plus me-2"></i>Add Influencer
+    </button>
+</div>
+
+<!-- Filter Bar -->
+<div class="card p-4 mb-4 border-0 shadow-sm">
+    <form method="GET" class="row g-3 align-items-center">
+        <div class="col-md-5">
+            <input type="text" name="search" class="form-control" placeholder="Search by name..." 
+                   value="{{ request.args.get('search', '') }}">
+        </div>
+        <div class="col-md-4">
+            <select name="category" class="form-select border-primary">
+                <option value="All">All Categories</option>
+                {% for cat in categories %}
+                    <option value="{{ cat.category_name }}" 
+                        {{ 'selected' if request.args.get('category') == cat.category_name else '' }}>
+                        {{ cat.category_name }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-3">
+            <button type="submit" class="btn btn-primary w-100 fw-bold">
+                <i class="fas fa-filter me-2"></i>Filter by Niche
+            </button>
+        </div>
+    </form>
+</div>
+
+<!-- Influencer Grid Cards -->
+<div class="row g-4">
+    {% for inf in influencers %}
+    <div class="col-md-6 col-lg-3">
+        <div class="card h-100 p-3 position-relative influencer-card shadow-sm border-0 {% if inf.is_busy %}opacity-75{% endif %}">
+            
+            <!-- Availability Badge -->
+            {% if inf.is_busy %}
+                <span class="badge bg-warning position-absolute top-0 end-0 m-2" 
+                      title="Currently working on: {{ inf.current_campaign }}">
+                    <i class="fas fa-clock me-1"></i> Busy
+                </span>
+            {% else %}
+                <span class="badge bg-success position-absolute top-0 end-0 m-2">
+                    <i class="fas fa-check-circle me-1"></i> Available
+                </span>
+            {% endif %}
+
+            <div class="text-center mt-3">
+                <!-- Gradient Avatar (No Image needed) -->
+                <div class="mx-auto mb-3" 
+                     style="width: 70px; height: 70px; background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%); color: white; display: flex; align-items: center; justify-content: center; border-radius: 50%; font-size: 1.8rem; box-shadow: 0 4px 10px rgba(220,38,38,0.3);">
+                    {{ inf.name[0] | upper }}
+                </div>
+                     
+                <h5 class="fw-bold mb-1">{{ inf.name }}</h5>
+                <span class="badge bg-secondary mb-2">{{ inf.categories or 'Uncategorized' }}</span>
+            </div>
+
+            <hr class="my-2">
+
+            <div class="row text-center mt-2">
+                <div class="col-6 border-end">
+                    <small class="text-muted d-block">Followers</small>
+                    <strong>{{ "{:,}".format(inf.follower_count) }}</strong>
+                </div>
+                <div class="col-6">
+                    <small class="text-muted d-block">
+                        Engagement 
+                        <i class="fas fa-info-circle text-primary" 
+                           data-bs-toggle="tooltip" 
+                           title="Likes + Comments / Reach. Higher is better!">
+                        </i>
+                    </small>
+                    <strong>{{ inf.engagement_rate }}%</strong>
+                </div>
+            </div>
+
+            <div class="mt-3 text-center">
+                <div class="d-inline-block px-3 py-1 rounded-pill bg-primary-light text-primary fw-bold border border-primary">
+                    Brand Fit: {{ inf.brand_fit_score }}%
+                    <i class="fas fa-question-circle ms-1" 
+                       data-bs-toggle="tooltip" 
+                       title="Calculated by comparing their followers and engagement specifically within this niche.">
+                    </i>
+                </div>
+            </div>
+
+            <div class="mt-4 d-flex justify-content-between">
+                <a href="{{ url_for('influencer_profile', id=inf.influencer_id) }}" 
+                   class="btn btn-sm btn-outline-primary w-100 me-1" title="View">
+                    <i class="fas fa-eye"></i> View
+                </a>
+                <button class="btn btn-sm btn-outline-warning w-100 ms-1" title="Edit"
+                        data-bs-toggle="modal" data-bs-target="#editModal{{ inf.influencer_id }}">
+                    <i class="fas fa-edit"></i> Edit
+                </button>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="col-12 text-center py-5 text-muted">
+        <h5>No influencers found in this category.</h5>
+        <p>Try changing the filter or adding a new creator.</p>
+    </div>
+    {% endfor %}
+</div>
+
+<!-- ========================================== -->
+<!-- MODALS (Add & Edit) -->
+<!-- ========================================== -->
+<div class="modal fade" id="addInfluencerModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <form action="{{ url_for('create_influencer') }}" method="POST">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="fas fa-user-plus me-2"></i>Add New Influencer</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Full Name *</label>
+                            <input type="text" name="name" class="form-control" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Status</label>
+                            <select name="registration_status" class="form-select">
+                                <option value="Active">Active</option>
+                                <option value="Pending">Pending</option>
+                                <option value="Inactive">Inactive</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Bio</label>
+                        <textarea name="bio" class="form-control" rows="2"></textarea>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Follower Count *</label>
+                            <input type="number" name="follower_count" class="form-control" min="0" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Engagement Rate (%) *</label>
+                            <input type="number" step="0.01" name="engagement_rate" class="form-control" 
+                                   min="0" max="100" required>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Categories</label>
+                        <div class="row g-2">
+                            {% for cat in categories %}
+                            <div class="col-md-4">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" 
+                                           name="categories" value="{{ cat.category_id }}" 
+                                           id="add_cat{{ cat.category_id }}">
+                                    <label class="form-check-label" for="add_cat{{ cat.category_id }}">
+                                        {{ cat.category_name }}
+                                    </label>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <hr>
+                    <h6 class="fw-bold mb-3">Contact Information (Optional)</h6>
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Type</label>
+                            <select name="contact_type" class="form-select">
+                                <option value="">-- Select --</option>
+                                <option value="Email">Email</option>
+                                <option value="Instagram DM">Instagram DM</option>
+                                <option value="Phone">Phone</option>
+                                <option value="WhatsApp">WhatsApp</option>
+                            </select>
+                        </div>
+                        <div class="col-md-8 mb-3">
+                            <label class="form-label">Contact Detail (e.g., email@domain.com)</label>
+                            <input type="text" name="contact_value" class="form-control">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Influencer</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- EDIT MODALS -->
+{% for inf in influencers %}
+<div class="modal fade" id="editModal{{ inf.influencer_id }}" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <form action="{{ url_for('update_influencer', id=inf.influencer_id) }}" method="POST">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="fas fa-edit me-2"></i>Edit {{ inf.name }}</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Full Name *</label>
+                            <input type="text" name="name" class="form-control" value="{{ inf.name }}" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Status</label>
+                            <select name="registration_status" class="form-select">
+                                <option value="Active" {{ 'selected' if inf.registration_status == 'Active' }}>Active</option>
+                                <option value="Pending" {{ 'selected' if inf.registration_status == 'Pending' }}>Pending</option>
+                                <option value="Inactive" {{ 'selected' if inf.registration_status == 'Inactive' }}>Inactive</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Bio</label>
+                        <textarea name="bio" class="form-control" rows="2">{{ inf.bio or '' }}</textarea>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Follower Count *</label>
+                            <input type="number" name="follower_count" class="form-control" 
+                                   value="{{ inf.follower_count }}" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Engagement Rate (%) *</label>
+                            <input type="number" step="0.01" name="engagement_rate" class="form-control" 
+                                   value="{{ inf.engagement_rate }}" required>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Categories</label>
+                        <div class="row g-2">
+                            {% for cat in categories %}
+                            <div class="col-md-4">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" 
+                                           name="categories" value="{{ cat.category_id }}"
+                                           id="edit{{ inf.influencer_id }}_cat{{ cat.category_id }}"
+                                           {{ 'checked' if cat.category_name in (inf.categories or '') }}>
+                                    <label class="form-check-label" 
+                                           for="edit{{ inf.influencer_id }}_cat{{ cat.category_id }}">
+                                        {{ cat.category_name }}
+                                    </label>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Update</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endfor %}
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener("DOMContentLoaded", function(){
+        // 1. Activate Tooltips
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl)
+        });
+
+        // 2. AUTO-GROWTH ENGINE (Updates Followers & Engagement in real-time)
+        setInterval(function() {
+            // Call the backend to simulate new followers arriving
+            fetch('/api/auto_grow_metrics')
+                .then(response => response.json())
+                .then(data => {
+                    if(data.status === 'success') {
+                        // Reload the page to show the updated numbers
+                        window.location.reload();
+                    }
+                });
+        }, 10000); 
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="mb-4">
+    <a href="{{ url_for('influencers') }}" class="text-decoration-none text-muted">
+        <i class="fas fa-arrow-left me-2"></i>Back to Influencers
+    </a>
+</div>
+
+<div class="row">
+    <div class="col-md-4">
+        <div class="card p-4 text-center">
+            <div class="profile-avatar mx-auto mb-3">{{ influencer.name[0] }}</div>
+            <h4 class="fw-bold">{{ influencer.name }}</h4>
+            <p class="text-muted">{{ influencer.categories or 'No categories' }}</p>
+            <hr>
+            <div class="row text-start">
+                <div class="col-6 mb-2"><strong>Followers:</strong><br>{{ "{:,}".format(influencer.follower_count) }}</div>
+                <div class="col-6 mb-2"><strong>Engagement:</strong><br>{{ influencer.engagement_rate }}%</div>
+                <div class="col-12 mb-2">
+                    <strong>Status:</strong>
+                    <span class="badge bg-success">{{ influencer.registration_status }}</span>
+                </div>
+                <div class="col-12"><strong>Joined:</strong> {{ influencer.registered_at.strftime('%Y-%m-%d') }}</div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-8">
+        <div class="card p-4 mb-4">
+            <h5 class="fw-bold mb-3">Bio</h5>
+            <p class="text-muted">{{ influencer.bio or 'No bio provided.' }}</p>
+        </div>
+        
+        <div class="card p-4">
+            <h5 class="fw-bold mb-3">Contact History</h5>
+            <table class="table table-sm">
+                <thead>
+                    <tr><th>Type</th><th>Value</th><th>Last Contacted</th><th>Status</th></tr>
+                </thead>
+                <tbody>
+                    {% for c in contacts %}
+                    <tr>
+                        <td>{{ c.contact_type }}</td>
+                        <td>{{ c.contact_value }}</td>
+                        <td>{{ c.last_contacted_date }}</td>
+                        <td><span class="badge bg-info">{{ c.status }}</span></td>
+                    </tr>
+                    {% else %}
+                    <tr><td colspan="4" class="text-center text-muted">No contact history.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

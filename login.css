@@ -1,0 +1,368 @@
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body.login-page {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #fdf3f3;
+    background-image:
+        radial-gradient(circle at 0% 0%, rgba(220, 38, 38, 0.10) 0%, transparent 45%),
+        radial-gradient(circle at 100% 100%, rgba(244, 63, 94, 0.08) 0%, transparent 45%),
+        radial-gradient(circle at 50% 50%, rgba(239, 68, 68, 0.05) 0%, transparent 60%);
+    padding: 24px;
+    position: relative;
+    overflow: hidden;
+}
+
+body.login-page::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image:
+        linear-gradient(rgba(220, 38, 38, 0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(220, 38, 38, 0.04) 1px, transparent 1px);
+    background-size: 44px 44px;
+    pointer-events: none;
+    mask-image: radial-gradient(ellipse at center, black 20%, transparent 70%);
+    -webkit-mask-image: radial-gradient(ellipse at center, black 20%, transparent 70%);
+}
+
+.login-container {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    width: 100%;
+    max-width: 1000px;
+    background: #ffffff;
+    border-radius: 24px;
+    overflow: hidden;
+    box-shadow:
+        0 1px 3px rgba(127, 29, 29, 0.06),
+        0 20px 60px -20px rgba(220, 38, 38, 0.2),
+        0 40px 100px -40px rgba(127, 29, 29, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.9);
+    animation: cardIn 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@keyframes cardIn {
+    from { opacity: 0; transform: translateY(20px) scale(0.98); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.login-brand-panel {
+    background: linear-gradient(150deg, #7f1d1d 0%, #dc2626 55%, #ef4444 100%);
+    color: #fff;
+    padding: 48px 40px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    position: relative;
+    overflow: hidden;
+}
+
+.login-brand-panel::before {
+    content: '';
+    position: absolute;
+    width: 400px;
+    height: 400px;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.15), transparent 70%);
+    top: -100px;
+    right: -100px;
+    border-radius: 50%;
+}
+
+.login-brand-panel::after {
+    content: '';
+    position: absolute;
+    width: 300px;
+    height: 300px;
+    background: radial-gradient(circle, rgba(251, 146, 60, 0.3), transparent 70%);
+    bottom: -100px;
+    left: -80px;
+    border-radius: 50%;
+}
+
+.brand-logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    position: relative;
+    z-index: 1;
+}
+
+.brand-logo-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+}
+
+.brand-logo-text {
+    font-size: 1.125rem;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+}
+
+.brand-hero {
+    position: relative;
+    z-index: 1;
+    margin-top: 40px;
+}
+
+.brand-hero h2 {
+    font-size: 1.75rem;
+    font-weight: 700;
+    line-height: 1.25;
+    margin-bottom: 12px;
+    letter-spacing: -0.02em;
+}
+
+.brand-hero p {
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.85);
+    line-height: 1.6;
+}
+
+.brand-features {
+    position: relative;
+    z-index: 1;
+    margin-top: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.brand-feature {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.brand-feature-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.12);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.85rem;
+    flex-shrink: 0;
+}
+
+.login-form-panel {
+    padding: 56px 48px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    background: #fffdfd;
+}
+
+.login-form-header {
+    margin-bottom: 32px;
+}
+
+.login-form-header h3 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #450a0a;
+    margin-bottom: 6px;
+    letter-spacing: -0.02em;
+}
+
+.login-form-header p {
+    color: #7f1d1d;
+    opacity: 0.75;
+    font-size: 0.875rem;
+    margin: 0;
+}
+
+.login-form .form-group {
+    margin-bottom: 18px;
+}
+
+.login-form label {
+    display: block;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: #7f1d1d;
+    margin-bottom: 8px;
+    letter-spacing: -0.005em;
+}
+
+.login-form .input-wrapper {
+    position: relative;
+}
+
+.login-form .input-wrapper i {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #f87171;
+    font-size: 0.875rem;
+    transition: color 0.2s;
+    pointer-events: none;
+}
+
+.login-form input {
+    width: 100%;
+    padding: 12px 14px 12px 42px;
+    background: #ffffff;
+    border: 1px solid #fecaca;
+    border-radius: 10px;
+    color: #450a0a;
+    font-size: 0.9rem;
+    font-family: inherit;
+    transition: all 0.15s ease;
+    outline: none;
+    box-shadow: 0 1px 2px rgba(127, 29, 29, 0.03);
+}
+
+.login-form input::placeholder {
+    color: #fca5a5;
+}
+
+.login-form input:hover {
+    border-color: #f87171;
+}
+
+.login-form input:focus {
+    border-color: #dc2626;
+    box-shadow: 0 0 0 4px rgba(220, 38, 38, 0.12);
+}
+
+.login-form .input-wrapper:focus-within i {
+    color: #dc2626;
+}
+
+.btn-login {
+    width: 100%;
+    padding: 13px;
+    border: none;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%);
+    color: #fff;
+    font-weight: 600;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin-top: 8px;
+    box-shadow: 0 4px 12px -2px rgba(220, 38, 38, 0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-family: inherit;
+    letter-spacing: -0.005em;
+}
+
+.btn-login:hover {
+    background: linear-gradient(135deg, #b91c1c 0%, #dc2626 100%);
+    box-shadow: 0 8px 20px -4px rgba(220, 38, 38, 0.5);
+    transform: translateY(-1px);
+}
+
+.btn-login:active {
+    transform: translateY(0);
+}
+
+.login-form-panel .alert {
+    border: 1px solid #fecaca;
+    border-radius: 10px;
+    padding: 11px 14px;
+    font-size: 0.8125rem;
+    margin-bottom: 18px;
+    background: #fef2f2;
+    color: #991b1b;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 1px 2px rgba(220, 38, 38, 0.06);
+}
+
+.login-form-footer {
+    margin-top: 28px;
+    padding-top: 24px;
+    border-top: 1px solid #fee2e2;
+}
+
+.login-form-footer > div:first-child {
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: #f87171;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 10px;
+}
+
+.credential-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 14px;
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    border-radius: 8px;
+    color: #7f1d1d;
+    font-family: 'SF Mono', 'Monaco', 'Courier New', monospace;
+    font-size: 0.75rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.credential-badge:hover {
+    background: #fee2e2;
+    border-color: #fca5a5;
+}
+
+.credential-badge i {
+    color: #dc2626;
+    font-size: 0.8125rem;
+}
+
+@media (max-width: 860px) {
+    .login-container {
+        grid-template-columns: 1fr;
+        max-width: 440px;
+    }
+    .login-brand-panel {
+        padding: 32px 28px;
+        min-height: 180px;
+    }
+    .brand-features {
+        display: none;
+    }
+    .brand-hero h2 {
+        font-size: 1.35rem;
+    }
+    .login-form-panel {
+        padding: 36px 28px;
+    }
+}
+
+@media (max-width: 480px) {
+    .login-container {
+        border-radius: 18px;
+    }
+    .login-form-header h3 {
+        font-size: 1.35rem;
+    }
+}
